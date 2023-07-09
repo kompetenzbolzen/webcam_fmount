@@ -53,6 +53,34 @@ base_thickness = 4;
 // if the sensor pertrudes from the mounting plane
 sensor_offset = 1;
 
+module filter_mount() {
+  tolerance = 0.6;
+  l = 6.5 + tolerance;
+  h = 1.5;
+  lip = 0.3;
+  lip_h = 0.6;
+
+  translate([0,0,-h]) {
+    linear_extrude(lip_h) difference() {
+      square(l, center=true);
+      offset(delta=-lip) square(l, center=true);
+    }
+
+    linear_extrude(h) difference() {
+      square(mount_base-mount_wall, center=true);
+      square(l, center=true);
+    }
+
+    slant_h = base_thickness;
+    translate([0,0,-slant_h]) difference() {
+      linear_extrude(slant_h)
+        square(mount_base-mount_wall, center=true);
+      linear_extrude(slant_h, scale=(l - 2*lip)/(mount_base-mount_wall))
+        square(mount_base-mount_wall, center=true);
+    }
+  }
+}
+
 module screwpost_2d() {
   r = 2;
   screw=1;
@@ -61,6 +89,7 @@ module screwpost_2d() {
       circle(r);
       translate([0,-r]) square([(screw_distance-mount_base)/2,2*r]);
     }
+
     circle(screw);
   }
 }
@@ -95,3 +124,4 @@ translate([0,0,base_thickness]) {
 
 translate([0,0,-sensor_offset]) linear_extrude(base_thickness + sensor_offset) sensor_mount();
 translate([0,0,sensor_distance-flange_height]) nikon_f_flange();
+translate([0,0,base_thickness + sensor_offset]) filter_mount();
